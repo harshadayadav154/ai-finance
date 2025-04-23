@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/prisma";
+import { db } from "../lib/prisma";
 import { revalidatePath } from "next/cache";
 
 // This function is used to serialize the transaction object before sending it to the client
@@ -12,6 +12,12 @@ const serializedTransaction = (transaction) => {
   if (transaction.balance) {
     serialized.balance = transaction.balance.toNumber();
   }
+
+  if (transaction.amount) {
+    serialized.amount = transaction.amount.toNumber();
+  }
+
+  return serialized;
 };
 
 export async function createAccount(data) {
@@ -65,4 +71,31 @@ export async function createAccount(data) {
   } catch (error) {
     throw new Error(error.message);
   }
+}
+
+export async function getUserAccounts() {
+  // Check if user is authenticated
+  const { userId } = await auth();
+  if (!userId) throw new Error("User not authenticated");
+
+  // Check if user exists in the database
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  const accounts = await db.account.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    include: {
+      _count: {
+        select: {
+          transactions: true,
+        },
+      },
+    },
+  });
+  const serializedAccount = accounts.map(serializedTransaction);
+  return serializedAccount;
 }

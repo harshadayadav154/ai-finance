@@ -1,14 +1,13 @@
-import HeroSection from "@/components/hero";
-import { Button } from "@/components/ui/button";
+import HeroSection from "@/src/components/hero";
+import { Button } from "@/src/components/ui/button";
 import Image from "next/image";
 import {
   featuresData,
   howItWorksData,
   statsData,
   testimonialsData,
-} from "../../data/landing";
-import { Card, CardContent } from "@/components/ui/card";
-import { to } from "./../../.next/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_61dcf9ba._";
+} from "@/data/landing";
+import { Card, CardContent } from "@/src/components/ui/card";
 import Link from "next/link";
 
 export default function Home() {
