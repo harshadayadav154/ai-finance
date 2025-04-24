@@ -12,7 +12,6 @@ const AccountPage = async ({ params }) => {
   }
 
   const { transactions, ...account } = accountData;
-  console.log(accountData);
 
   return (
     <div className="space-y-8 px-5">
