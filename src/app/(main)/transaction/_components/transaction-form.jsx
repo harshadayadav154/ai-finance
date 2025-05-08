@@ -21,11 +21,12 @@ import {
   PopoverTrigger,
 } from "@/src/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Receipt } from "lucide-react";
 import { Calendar } from "@/src/components/ui/calendar";
 import { Switch } from "@/src/components/ui/switch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import ReceiptScanner from "./receipt-scanner";
 
 const AddTransactionForm = ({ accounts, categories }) => {
   const router = useRouter();
@@ -79,9 +80,25 @@ const AddTransactionForm = ({ accounts, categories }) => {
     }
   }, [transactionResult, transactionLoading]);
 
+  const handleScanComplete = (scannedData) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+    }
+    console.log(getValues("category"));
+  };
+
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {/* AI Receipt Scanner */}
+      <ReceiptScanner onScanComplete={handleScanComplete} />
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
         <Select
@@ -252,7 +269,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={!transactionLoading} className="flex-1">
+        <Button type="submit" disabled={transactionLoading} className="flex-1">
           Create Transaction
         </Button>
       </div>

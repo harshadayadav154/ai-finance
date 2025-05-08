@@ -2,8 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const useFetch = (callbackFunc) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(undefined);
+  const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
   const fn = async (...args) => {
