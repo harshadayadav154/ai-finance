@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 // This function is used to serialize the transaction object before sending it to the client
 // It converts the balance from a BigDecimal to a number for easier handling in the frontend
-const serializedTransaction = (transaction) => {
+const serializeTransaction = (transaction) => {
   const serialized = { ...transaction };
 
   if (transaction.balance) {
@@ -63,7 +63,7 @@ export async function createAccount(data) {
         },
       });
 
-      const serializedAccount = serializedTransaction(account);
+      const serializedAccount = serializeTransaction(account);
 
       revalidatePath("/dashboard");
       return { success: true, data: serializedAccount };
@@ -96,6 +96,26 @@ export async function getUserAccounts() {
       },
     },
   });
-  const serializedAccount = accounts.map(serializedTransaction);
+  const serializedAccount = accounts.map(serializeTransaction);
   return serializedAccount;
+}
+
+export async function getDashboardData() {
+  // Check if user is authenticated
+  const { userId } = await auth();
+  if (!userId) throw new Error("User not authenticated");
+
+  // Check if user exists in the database
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  const transactions = await db.transaction.findMany({
+    where: { userId: user.id },
+    orderBy: { date: "desc" },
+  });
+
+  return transactions.map(serializeTransaction);
 }
