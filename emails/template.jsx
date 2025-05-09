@@ -14,10 +14,84 @@ import * as React from "react";
 
 export default function EmailTemplate({
   userName = "",
-  type = "budget-alert",
+  type = "monthly-report",
   data = {},
 }) {
-  if (type === "monthly-budget") {
+  if (type === "monthly-report") {
+    console.log("Monthly Report Email", data);
+    return (
+      <Html>
+        <Head />
+        <Preview>Your Monthly Financial Report</Preview>
+        <Body style={styles.body}>
+          <Container style={styles.container}>
+            <Heading style={styles.title}>Monthly Financial Report</Heading>
+
+            <Text style={styles.text}>Hello {userName},</Text>
+            <Text style={styles.text}>
+              Here&rsquo;s your financial summary for {data?.month}:
+            </Text>
+
+            {/* Main Stats */}
+            <Section style={styles.statsContainer}>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Total Income</Text>
+                <Text style={styles.heading}>
+                  ${data?.stats.totalIncome.toFixed(2)}
+                </Text>
+              </div>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Total Expenses</Text>
+                <Text style={styles.heading}>
+                  ${data?.stats.totalExpenses.toFixed(2)}
+                </Text>
+              </div>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Net</Text>
+                <Text style={styles.heading}>
+                  $
+                  {(
+                    data?.stats.totalIncome - data?.stats.totalExpenses
+                  ).toFixed(2)}
+                </Text>
+              </div>
+            </Section>
+
+            {/* Category Breakdown */}
+            {data?.stats?.byCategory && (
+              <Section style={styles.section}>
+                <Heading style={styles.heading}>Expenses by Category</Heading>
+                {Object.entries(data?.stats.byCategory).map(
+                  ([category, amount]) => (
+                    <div key={category} style={styles.row}>
+                      <Text style={styles.text}>{category}</Text>
+                      <Text style={styles.text}>${amount}</Text>
+                    </div>
+                  )
+                )}
+              </Section>
+            )}
+
+            {/* AI Insights */}
+            {data?.insights && (
+              <Section style={styles.section}>
+                <Heading style={styles.heading}>WealthWise Insights</Heading>
+                {data.insights.map((insight, index) => (
+                  <Text key={index} style={styles.text}>
+                    • {insight}
+                  </Text>
+                ))}
+              </Section>
+            )}
+
+            <Text style={styles.footer}>
+              Thank you for using WealthWise. Keep tracking your finances for
+              better financial health!
+            </Text>
+          </Container>
+        </Body>
+      </Html>
+    );
   }
   if (type === "budget-alert") {
     console.log("Budget Alert Email", data);
@@ -85,6 +159,40 @@ const styles = {
     color: "#4b5563",
     fontSize: "16px",
     margin: "0 0 16px",
+  },
+  section: {
+    marginTop: "32px",
+    padding: "20px",
+    backgroundColor: "#f9fafb",
+    borderRadius: "5px",
+    border: "1px solid #e5e7eb",
+  },
+  statsContainer: {
+    margin: "32px 0",
+    padding: "20px",
+    backgroundColor: "#f9fafb",
+    borderRadius: "5px",
+  },
+  stat: {
+    marginBottom: "16px",
+    padding: "12px",
+    backgroundColor: "#fff",
+    borderRadius: "4px",
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+  },
+  row: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "12px 0",
+    borderBottom: "1px solid #e5e7eb",
+  },
+  footer: {
+    color: "#6b7280",
+    fontSize: "14px",
+    textAlign: "center",
+    marginTop: "32px",
+    paddingTop: "16px",
+    borderTop: "1px solid #e5e7eb",
   },
   section: {
     marginTop: "32px",
